@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -85,6 +85,7 @@
     <Compile Include="Core\Data\WidgetContext.cs" />
     <Compile Include="Core\PointerTrace.cs" />
     <Compile Include="Core\PointerTraceLevel.cs" />
+    <Compile Include="Ui\Remote\OverlayDisplayClient.cs" />
     <Compile Include="Game\Config\DebugConfig.cs" />
     <Compile Include="Game\Config\MemoryConfig.cs" />
     <Compile Include="Game\Config\MonsterCrownConfig.cs" />
