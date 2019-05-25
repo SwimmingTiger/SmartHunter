@@ -1,9 +1,5 @@
-﻿using Newtonsoft.Json;
-using SmartHunter.Core;
-using SmartHunter.Core.Data;
+﻿using SmartHunter.Core.Data;
 using SmartHunter.Game.Helpers;
-using SmartHunter.Ui.Remote;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 
@@ -48,12 +44,8 @@ namespace SmartHunter.Game.Data.WidgetContexts
             UpdateFromConfig();
         }
 
-        private readonly Dictionary<ulong /*address*/, string /*json*/> MonstersJson = new Dictionary<ulong, string>();
-
         public Monster UpdateAndGetMonster(ulong address, string id, float maxHealth, float currentHealth, float sizeScale)
         {
-            //Log.WriteLine($"UpdateAndGetMonster: {id}, {maxHealth}, {currentHealth}, {sizeScale}");
-
             Monster monster = null;
 
             monster = Monsters.FirstOrDefault(existingMonster => existingMonster.Address == address);
@@ -68,39 +60,6 @@ namespace SmartHunter.Game.Data.WidgetContexts
             {
                 monster = new Monster(address, id, maxHealth, currentHealth, sizeScale);
                 Monsters.Add(monster);
-            }
-
-            if (MonstersJson.ContainsKey(address))
-            {
-                if (monster.IsVisible)
-                {
-                    string oldJson = MonstersJson[address];
-                    string newJson = JsonConvert.SerializeObject(monster);
-                    if (oldJson != newJson) {
-                        MonstersJson[address] = newJson;
-                        Log.WriteLine("Update Monster: " + monster.Name + ", json: " + newJson);
-
-                        OverlayDisplayClient.GetInstance().UpdateView("monster", "Update('" + address.ToString() + "',[===[" + newJson + "]===])");
-                    }
-                }
-                else
-                {
-                    MonstersJson.Remove(address);
-                    Log.WriteLine("Remove Monster: " + monster.Name);
-
-                    OverlayDisplayClient.GetInstance().UpdateView("monster", "Remove('" + address.ToString() + "')");
-                }
-            }
-            else
-            {
-                if (monster.IsVisible)
-                {
-                    string json = JsonConvert.SerializeObject(monster);
-                    MonstersJson[address] = json;
-                    Log.WriteLine("Add Monster: " + monster.Name + ", json: " + json);
-
-                    OverlayDisplayClient.GetInstance().UpdateView("monster", "Add('" + address.ToString() + "',[===[" + json + "]===])");
-                }
             }
 
             monster.NotifyPropertyChanged(nameof(Monster.IsVisible));

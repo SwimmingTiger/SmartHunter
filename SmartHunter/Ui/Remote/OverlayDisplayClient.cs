@@ -29,23 +29,16 @@ namespace SmartHunter.Ui.Remote
             ws = new WebSocket(serverURI);
             ws.OnMessage += OnMessage;
             ws.Connect();
-
-            InitView();
         }
 
-        ~OverlayDisplayClient() {
-            DestoryView();
-        }
-
-        private void InitView() {
+        public void InitView() {
             string baseDir = System.Environment.CurrentDirectory.Replace('\\', '/').Replace("'", "\\'");
             SendLuaFile("monster", baseDir + "/monster.lua");
             SetRender("monster", "Render()");
         }
 
-        private void DestoryView() {
+        public void DestoryView() {
             RemoveWidget("monster");
-            ws.Close();
         }
 
         private void OnMessage(Object sender, MessageEventArgs e)

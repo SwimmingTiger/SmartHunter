@@ -1,6 +1,9 @@
-﻿using SmartHunter.Core.Helpers;
+﻿using Newtonsoft.Json;
+using SmartHunter.Core;
+using SmartHunter.Core.Helpers;
 using SmartHunter.Game.Data;
 using SmartHunter.Game.Data.ViewModels;
+using SmartHunter.Ui.Remote;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -245,11 +248,15 @@ namespace SmartHunter.Game.Helpers
             return player;
         }
 
+        private readonly static Dictionary<ulong /*address*/, string /*json*/> m_MonstersJson = new Dictionary<ulong, string>();
+
         public static void UpdateMonsterWidget(Process process, ulong lastMonsterAddress)
         {
             if (lastMonsterAddress < 0xffffff)
             {
                 OverlayViewModel.Instance.MonsterWidget.Context.Monsters.Clear();
+                m_MonstersJson.Clear();
+                OverlayDisplayClient.GetInstance().UpdateView("monster", "RemoveAll()");
                 return;
             }
 
@@ -269,6 +276,27 @@ namespace SmartHunter.Game.Helpers
                 if (monster != null)
                 {
                     updatedMonsters.Add(monster);
+
+                    if (m_MonstersJson.ContainsKey(monsterAddress))
+                    {
+                        string oldJson = m_MonstersJson[monsterAddress];
+                        string newJson = JsonConvert.SerializeObject(monster);
+                        if (oldJson != newJson)
+                        {
+                            m_MonstersJson[monsterAddress] = newJson;
+                            //Log.WriteLine("Update Monster: " + monster.Name + ", json: " + newJson);
+
+                            OverlayDisplayClient.GetInstance().UpdateView("monster", "Update('" + monsterAddress.ToString() + "',[===[" + newJson + "]===])");
+                        }
+                    }
+                    else
+                    {
+                        string json = JsonConvert.SerializeObject(monster);
+                        m_MonstersJson[monsterAddress] = json;
+                        Log.WriteLine("Add Monster: " + monster.Name + ", json: " + json);
+                        
+                        OverlayDisplayClient.GetInstance().UpdateView("monster", "Add('" + monsterAddress.ToString() + "',[===[" + json + "]===])");
+                    }
                 }
             }
 
@@ -277,6 +305,8 @@ namespace SmartHunter.Game.Helpers
             foreach (var obsoleteMonster in obsoleteMonsters.Reverse())
             {
                 OverlayViewModel.Instance.MonsterWidget.Context.Monsters.Remove(obsoleteMonster);
+                m_MonstersJson.Remove(obsoleteMonster.Address);
+                OverlayDisplayClient.GetInstance().UpdateView("monster", "Remove('" + obsoleteMonster.Address.ToString() + "')");
             }
         }
 

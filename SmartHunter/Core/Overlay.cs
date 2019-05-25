@@ -1,5 +1,6 @@
 ﻿using SmartHunter.Core.Helpers;
 using SmartHunter.Core.Windows;
+using SmartHunter.Ui.Remote;
 using System;
 using System.Windows;
 using System.Windows.Input;
@@ -32,10 +33,13 @@ namespace SmartHunter.Core
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
             UpdateWidgetsFromConfig();
+            OverlayDisplayClient.GetInstance().InitView();
         }
 
         private void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
+            OverlayDisplayClient.GetInstance().DestoryView();
+
             foreach (var widgetWindow in WidgetWindows)
             {
                 widgetWindow.Close();
