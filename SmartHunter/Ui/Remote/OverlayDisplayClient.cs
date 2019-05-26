@@ -34,13 +34,13 @@ namespace SmartHunter.Ui.Remote
 
         public void InitView() {
             string baseDir = System.Environment.CurrentDirectory.Replace('\\', '/').Replace("'", "\\'");
-            SendLuaFile("monster", baseDir + "/locale.lua");
-            SendLuaFile("monster", baseDir + "/monster.lua");
-            SetRender("monster", "Render()");
+            SendLuaFile("smarthunter", baseDir + "/locale.lua");
+            SendLuaFile("smarthunter", baseDir + "/render.lua");
+            SetRender("smarthunter", "Render()");
         }
 
         public void DestoryView() {
-            RemoveWidget("monster");
+            RemoveWidget("smarthunter");
         }
 
         private void OnMessage(Object sender, MessageEventArgs e)
