@@ -53,8 +53,11 @@ end
 MONSTERS = {}
 
 function Update(address, data)
-	MONSTERS[address] = json.decode(data)
-	LogLine("add monster: "..MONSTERS[address].Name)
+	local monster = json.decode(data)
+	if (MONSTERS[address] == nil) then
+		LogLine("add monster: "..monster.Name)
+	end
+	MONSTERS[address] = monster
 end
 
 Add = Update
@@ -82,7 +85,11 @@ end
 
 function MonsterWindow(monster, currPosition)
 	ig.SetNextWindowPos(ig.ImVec2(currPosition, 10))
-	ig.Begin(monster.Name, nil, WINDOW_FLAG)
+	local name = monster.Name
+	if (monster.Crown > 0) then
+		name = name..' ('..CROWN_NAME[monster.Crown]..')'
+	end
+	ig.Begin(name, nil, WINDOW_FLAG)
 	MonsterDetail(monster)
 	ig.End()
 end
@@ -107,7 +114,11 @@ function MonsterDetail(monster)
 end
 
 function MonsterPart(part)
-	local percentString = DecentralizedAlignment(part.Name, tostring(math.ceil(part.Health.Current)) .. '/' .. tostring(math.ceil(part.Health.Max)), LINE_SIZE)
+	local name = part.Name
+	if (part.TimesBrokenCount > 0) then
+		name = name .. ' x' .. tostring(part.TimesBrokenCount)
+	end
+	local percentString = DecentralizedAlignment(name, tostring(math.ceil(part.Health.Current)) .. '/' .. tostring(math.ceil(part.Health.Max)), LINE_SIZE)
 	ig.Text(percentString)
 
 	local percent = part.Health.Current / part.Health.Max
@@ -116,7 +127,11 @@ function MonsterPart(part)
 end
 
 function StatusEffect(effect)
-	local percentString = DecentralizedAlignment(effect.Name, tostring(math.ceil(effect.Buildup.Current)) .. '/' .. tostring(math.ceil(effect.Buildup.Max)), LINE_SIZE)
+	local name = effect.Name
+	if (effect.TimesActivatedCount > 0) then
+		name = name .. ' x' .. tostring(effect.TimesActivatedCount)
+	end
+	local percentString = DecentralizedAlignment(name, tostring(math.ceil(effect.Buildup.Current)) .. '/' .. tostring(math.ceil(effect.Buildup.Max)), LINE_SIZE)
 	ig.Text(percentString)
 
 	local percent = effect.Buildup.Current / effect.Buildup.Max

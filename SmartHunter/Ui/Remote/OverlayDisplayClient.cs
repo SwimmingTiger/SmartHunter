@@ -34,6 +34,7 @@ namespace SmartHunter.Ui.Remote
 
         public void InitView() {
             string baseDir = System.Environment.CurrentDirectory.Replace('\\', '/').Replace("'", "\\'");
+            SendLuaFile("monster", baseDir + "/locale.lua");
             SendLuaFile("monster", baseDir + "/monster.lua");
             SetRender("monster", "Render()");
         }
