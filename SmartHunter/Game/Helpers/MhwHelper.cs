@@ -285,7 +285,7 @@ namespace SmartHunter.Game.Helpers
                             m_MonstersJson[monsterAddress] = newJson;
                             //Log.WriteLine("Update Monster: " + monster.Name + ", json: " + newJson);
 
-                            OverlayDisplayClient.GetInstance().UpdateView("monster", "Update('" + monsterAddress.ToString() + "',[===[" + newJson + "]===])");
+                            OverlayDisplayClient.GetInstance().UpdateView("smarthunter", "UpdateMonster('" + monsterAddress.ToString() + "',[===[" + newJson + "]===])");
                         }
                     }
                     else
@@ -295,7 +295,7 @@ namespace SmartHunter.Game.Helpers
                         //Log.WriteLine("Add Monster: " + monster.Name + ", json: " + json);
                         Log.WriteLine("Add Monster: " + monster.Name);
 
-                        OverlayDisplayClient.GetInstance().UpdateView("monster", "Add('" + monsterAddress.ToString() + "',[===[" + json + "]===])");
+                        OverlayDisplayClient.GetInstance().UpdateView("smarthunter", "AddMonster('" + monsterAddress.ToString() + "',[===[" + json + "]===])");
                     }
                 }
             }
@@ -306,7 +306,7 @@ namespace SmartHunter.Game.Helpers
             {
                 OverlayViewModel.Instance.MonsterWidget.Context.Monsters.Remove(obsoleteMonster);
                 m_MonstersJson.Remove(obsoleteMonster.Address);
-                OverlayDisplayClient.GetInstance().UpdateView("monster", "Remove('" + obsoleteMonster.Address.ToString() + "')");
+                OverlayDisplayClient.GetInstance().UpdateView("smarthunter", "RemoveMonster('" + obsoleteMonster.Address.ToString() + "')");
             }
         }
 

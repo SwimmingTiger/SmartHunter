@@ -1,4 +1,4 @@
-LogLine("---------- Loading Monster Widget ----------")
+LogLine("---------- Loading SmartHunter Widget ----------")
 
 ------------------------ Themes --------------------------
 
@@ -52,7 +52,7 @@ end
 
 MONSTERS = {}
 
-function Update(address, data)
+function UpdateMonster(address, data)
 	local monster = json.decode(data)
 	if (MONSTERS[address] == nil) then
 		LogLine("add monster: "..monster.Name)
@@ -60,14 +60,14 @@ function Update(address, data)
 	MONSTERS[address] = monster
 end
 
-Add = Update
+AddMonster = UpdateMonster
 
-function Remove(address)
+function RemoveMonster(address)
 	LogLine("remove monster: "..MONSTERS[address].Name)
 	MONSTERS[address] = nil
 end
 
-function RemoveAll()
+function RemoveAllMonster()
 	MONSTERS = {}
 end
 
@@ -139,4 +139,4 @@ function StatusEffect(effect)
 	ig.ProgressBar(percent, ig.ImVec2(LINE_WIDTH, 3), "")
 end
 
-LogLine("---------- Monster Widget Loaded ----------")
+LogLine("---------- SmartHunter Widget Loaded ----------")
