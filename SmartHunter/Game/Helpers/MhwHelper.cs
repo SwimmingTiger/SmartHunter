@@ -119,6 +119,17 @@ namespace SmartHunter.Game.Helpers
             }
         }
 
+        private class PlayerEffectTimer
+        {
+            public int Index;
+            public string Name;
+            public double BeginTime;
+            public double EndTime;
+            public bool IsVisible;
+        }
+
+        private readonly static Dictionary<int /*index*/, PlayerEffectTimer /*timer*/> m_PlayerEffectTimers = new Dictionary<int, PlayerEffectTimer>();
+
         public static void UpdatePlayerWidget(Process process, ulong baseAddress, ulong equipmentAddress, ulong weaponAddress)
         {
             for (int index = 0; index < ConfigHelper.PlayerData.Values.StatusEffects.Length; ++index)
@@ -203,7 +214,42 @@ namespace SmartHunter.Game.Helpers
                     }
                 }
 
-                OverlayViewModel.Instance.PlayerWidget.Context.UpdateAndGetPlayerStatusEffect(index, timer, allConditionsPassed);
+                PlayerStatusEffect effect = OverlayViewModel.Instance.PlayerWidget.Context.UpdateAndGetPlayerStatusEffect(index, timer, allConditionsPassed);
+                if (effect != null)
+                {
+                    //Log.WriteLine("PlayerStatusEffect: " + JsonConvert.SerializeObject(effect));
+
+                    PlayerEffectTimer effectTimer = new PlayerEffectTimer();
+                    effectTimer.Index = effect.Index;
+                    effectTimer.Name = effect.Name;
+                    effectTimer.EndTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds() + effect.Time.Current;
+                    effectTimer.BeginTime = effectTimer.EndTime - effect.Time.Max;
+                    effectTimer.IsVisible = effect.IsVisible;
+
+                    if (m_PlayerEffectTimers.ContainsKey(effectTimer.Index))
+                    {
+                        PlayerEffectTimer oldTimer = m_PlayerEffectTimers[effectTimer.Index];
+                        if (oldTimer.Name != effectTimer.Name || oldTimer.IsVisible != effectTimer.IsVisible || System.Math.Abs(effectTimer.EndTime - oldTimer.EndTime) > 1.0)
+                        {
+                            m_PlayerEffectTimers[effectTimer.Index] = effectTimer;
+                            string json = JsonConvert.SerializeObject(effectTimer);
+
+                            Log.WriteLine("Update PlayerEffect: " + effectTimer.Name + ", json: " + json);
+
+                            OverlayDisplayClient.GetInstance().UpdateView("smarthunter", "UpdatePlayerEffect('" + effectTimer.Index.ToString() + "',[===[" + json + "]===])");
+                        }
+                    }
+                    else
+                    {
+                        m_PlayerEffectTimers[effectTimer.Index] = effectTimer;
+                        string json = JsonConvert.SerializeObject(effectTimer);
+
+                        Log.WriteLine("Add PlayerEffect: " + effectTimer.Name + ", json: " + json);
+                        //Log.WriteLine("Add PlayerEffect: " + effectTimer.Name);
+
+                        OverlayDisplayClient.GetInstance().UpdateView("smarthunter", "AddPlayerEffect('" + effectTimer.Index.ToString() + "',[===[" + json + "]===])");
+                    }
+                }
             }
         }
 
