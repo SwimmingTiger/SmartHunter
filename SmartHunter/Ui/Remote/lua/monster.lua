@@ -2,6 +2,10 @@ LogLine("---------- Loading Monster Widget ----------")
 
 ------------------------ Themes --------------------------
 
+-- load fonts
+--ig.GetIO().Fonts:AddFontFromFileTTF('C:\\Windows\\Fonts\\msyh.ttc', 16, nil, ig.GetIO().Fonts:GetGlyphRangesChineseFull())
+--UpdateFontCache()
+
 function RGBA(r, g, b, a)
 	return ig.ImVec4(r/255, g/255, b/255, a)
 end
@@ -27,9 +31,11 @@ COLOR_WINDOW_BG = RGBA(0, 0, 0, 0)
 
 WINDOW_FLAG = imgui.ImGuiWindowFlags_NoCollapse + imgui.ImGuiWindowFlags_AlwaysAutoResize + imgui.ImGuiWindowFlags_NoBackground
 
-function SetWindowStyle()
-	ig.PushStyleVarVec2(imgui.ImGuiStyleVar_WindowTitleAlign, ig.ImVec2(0.5, 1.5))
-end
+ig.GetStyle().WindowTitleAlign = ig.ImVec2(0.5, 1.5)
+SetWindowBGColor(COLOR_WINDOW_BG)
+
+LINE_WIDTH = 250
+LINE_SIZE = 27
 
 ------------------------- Utils --------------------------
 
@@ -65,12 +71,11 @@ end
 ------------------------- Render -------------------------
 
 function Render()
-	SetWindowStyle()
 	local currPosition = 600
 	for _, monster in pairs(MONSTERS) do
 		if (monster.IsVisible) then
 			MonsterWindow(monster, currPosition)
-			currPosition = currPosition + 250
+			currPosition = currPosition + 300
 		end
 	end
 end
@@ -84,9 +89,9 @@ end
 
 function MonsterDetail(monster)
 	local percent = monster.Health.Current / monster.Health.Max
-	local percentString = CenterAlignment(tostring(math.ceil(monster.Health.Current))..' / '..tostring(math.ceil(monster.Health.Max)), 30)
+	local percentString = CenterAlignment(tostring(math.ceil(monster.Health.Current))..'/'..tostring(math.ceil(monster.Health.Max)), LINE_SIZE)
 	SetProgressBarColor(COLOR_HEALTH)
-	ig.ProgressBar(percent, ig.ImVec2(0, 15), percentString)
+	ig.ProgressBar(percent, ig.ImVec2(LINE_WIDTH, 19), percentString)
 
 	for _, part in ipairs(monster.Parts) do
 		if (part.IsVisible) then
@@ -102,21 +107,21 @@ function MonsterDetail(monster)
 end
 
 function MonsterPart(part)
-	local percentString = DecentralizedAlignment(part.Name, tostring(math.ceil(part.Health.Current)) .. ' / ' .. tostring(math.ceil(part.Health.Max)), 30)
+	local percentString = DecentralizedAlignment(part.Name, tostring(math.ceil(part.Health.Current)) .. '/' .. tostring(math.ceil(part.Health.Max)), LINE_SIZE)
 	ig.Text(percentString)
 
 	local percent = part.Health.Current / part.Health.Max
 	SetProgressBarColor(COLOR_HEALTH)
-	ig.ProgressBar(percent, ig.ImVec2(0, 3), "")
+	ig.ProgressBar(percent, ig.ImVec2(LINE_WIDTH, 3), "")
 end
 
 function StatusEffect(effect)
-	local percentString = DecentralizedAlignment(effect.Name, tostring(math.ceil(effect.Buildup.Current)) .. ' / ' .. tostring(math.ceil(effect.Buildup.Max)), 30)
+	local percentString = DecentralizedAlignment(effect.Name, tostring(math.ceil(effect.Buildup.Current)) .. '/' .. tostring(math.ceil(effect.Buildup.Max)), LINE_SIZE)
 	ig.Text(percentString)
 
 	local percent = effect.Buildup.Current / effect.Buildup.Max
 	SetProgressBarColor(COLOR_EFFECT)
-	ig.ProgressBar(percent, ig.ImVec2(0, 3), "")
+	ig.ProgressBar(percent, ig.ImVec2(LINE_WIDTH, 3), "")
 end
 
 LogLine("---------- Monster Widget Loaded ----------")
