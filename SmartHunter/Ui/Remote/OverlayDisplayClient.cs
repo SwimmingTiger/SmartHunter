@@ -57,8 +57,15 @@ namespace SmartHunter.Ui.Remote
 
         public void SendText(string text)
         {
-            //Log.WriteLine("SendText: " + text);
-            ws.Send(text);
+            try
+            {
+                //Log.WriteLine("SendText: " + text);
+                ws.Send(text);
+            }
+            catch (Exception ex)
+            {
+                Log.WriteException(ex);
+            }
         }
 
         public void SendLuaFile(string widget, string filePath) {
