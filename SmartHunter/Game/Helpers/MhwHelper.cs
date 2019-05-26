@@ -256,7 +256,6 @@ namespace SmartHunter.Game.Helpers
             {
                 OverlayViewModel.Instance.MonsterWidget.Context.Monsters.Clear();
                 m_MonstersJson.Clear();
-                OverlayDisplayClient.GetInstance().UpdateView("monster", "RemoveAll()");
                 return;
             }
 
@@ -293,8 +292,9 @@ namespace SmartHunter.Game.Helpers
                     {
                         string json = JsonConvert.SerializeObject(monster);
                         m_MonstersJson[monsterAddress] = json;
-                        Log.WriteLine("Add Monster: " + monster.Name + ", json: " + json);
-                        
+                        //Log.WriteLine("Add Monster: " + monster.Name + ", json: " + json);
+                        Log.WriteLine("Add Monster: " + monster.Name);
+
                         OverlayDisplayClient.GetInstance().UpdateView("monster", "Add('" + monsterAddress.ToString() + "',[===[" + json + "]===])");
                     }
                 }

@@ -7,6 +7,7 @@ using WebSocketSharp;
 using SmartHunter.Core;
 using Newtonsoft.Json;
 using System.IO;
+using Newtonsoft.Json.Linq;
 
 namespace SmartHunter.Ui.Remote
 {
@@ -43,11 +44,19 @@ namespace SmartHunter.Ui.Remote
 
         private void OnMessage(Object sender, MessageEventArgs e)
         {
-            Log.WriteLine(e.Data);
+            JObject response = JObject.Parse(e.Data);
+            string lastError = (string)response.SelectToken("last_error");
+            string errorMessage = (string)response.SelectToken("error.message");
+            if ((lastError != null && lastError.Length > 0) || (errorMessage != null && errorMessage.Length > 0))
+            {
+                Log.WriteLine("Error from OverlayDisplayServer: " + e.Data);
+            }
+
         }
 
         public void SendText(string text)
         {
+            //Log.WriteLine("SendText: " + text);
             ws.Send(text);
         }
 
