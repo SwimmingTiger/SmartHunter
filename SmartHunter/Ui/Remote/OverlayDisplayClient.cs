@@ -8,19 +8,21 @@ using SmartHunter.Core;
 using Newtonsoft.Json;
 using System.IO;
 using Newtonsoft.Json.Linq;
+using System.Threading;
 
 namespace SmartHunter.Ui.Remote
 {
     class OverlayDisplayClient
     {
         private static OverlayDisplayClient instance;
-        private WebSocket ws;
+        private readonly WebSocket ws;
+        private bool connected = false;
 
         public static OverlayDisplayClient GetInstance()
         {
             if (instance == null)
             {
-                instance = new OverlayDisplayClient("ws://localhost:12345");
+                instance = new OverlayDisplayClient("ws://127.0.0.1:12345");
             }
             return instance;
         }
@@ -28,18 +30,39 @@ namespace SmartHunter.Ui.Remote
         private OverlayDisplayClient(string serverURI)
         {
             ws = new WebSocket(serverURI);
+            ws.OnOpen += (sender, e) =>
+            {
+                Log.WriteLine("Connected to OverlayDisplayServer.");
+                connected = true;
+                InitView();
+            };
+            ws.OnClose += (sender, e) =>
+            {
+                connected = false;
+                Thread.Sleep(5000);
+                Connect();
+            };
+            ws.OnError += (sender, e) =>
+            {
+                Log.WriteLine(e.ToString());
+            };
             ws.OnMessage += OnMessage;
-            ws.Connect();
         }
 
-        public void InitView() {
+        public void Connect() {
+            Log.WriteLine("Connecting to OverlayDisplayServer...");
+            ws.ConnectAsync();
+        }
+
+        private void InitView() {
             string baseDir = System.Environment.CurrentDirectory.Replace('\\', '/').Replace("'", "\\'");
             SendLuaFile("smarthunter", baseDir + "/locale.lua");
             SendLuaFile("smarthunter", baseDir + "/render.lua");
             SetRender("smarthunter", "Render()");
         }
 
-        public void DestoryView() {
+        public void DestoryView()
+        {
             RemoveWidget("smarthunter");
         }
 
@@ -57,6 +80,11 @@ namespace SmartHunter.Ui.Remote
 
         public void SendText(string text)
         {
+            if (!connected)
+            {
+                return;
+            }
+
             try
             {
                 //Log.WriteLine("SendText: " + text);
