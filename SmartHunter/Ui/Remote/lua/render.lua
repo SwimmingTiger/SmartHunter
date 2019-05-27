@@ -106,6 +106,11 @@ end
 ------------------------- Render -------------------------
 
 function Render()
+	ig.SetNextWindowPos(ig.ImVec2(2300, 0))
+	ig.Begin('Time', nil, PLAYER_EFFECTS_WINDOW_FLAG)
+	ig.Text(os.date('%c'))
+	ig.End()
+
 	local currPosition = 600
 	for _, monster in pairs(MONSTERS) do
 		if (monster.IsVisible) then

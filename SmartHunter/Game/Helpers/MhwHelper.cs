@@ -244,8 +244,8 @@ namespace SmartHunter.Game.Helpers
                         m_PlayerEffectTimers[effectTimer.Index] = effectTimer;
                         string json = JsonConvert.SerializeObject(effectTimer);
 
-                        Log.WriteLine("Add PlayerEffect: " + effectTimer.Name + ", json: " + json);
-                        //Log.WriteLine("Add PlayerEffect: " + effectTimer.Name);
+                        //Log.WriteLine("Add PlayerEffect: " + effectTimer.Name + ", json: " + json);
+                        Log.WriteLine("Add PlayerEffect: " + effectTimer.Name);
 
                         OverlayDisplayClient.GetInstance().UpdateView("smarthunter", "AddPlayerEffect('" + effectTimer.Index.ToString() + "',[===[" + json + "]===])");
                     }

@@ -33,7 +33,7 @@ namespace SmartHunter.Core
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
             UpdateWidgetsFromConfig();
-            OverlayDisplayClient.GetInstance().InitView();
+            OverlayDisplayClient.GetInstance().Connect();
         }
 
         private void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
