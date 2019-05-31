@@ -85,6 +85,8 @@ function UpdatePlayerEffect(index, data)
 	local effect = json.decode(data)
 	if (PLAYER_EFFECTS[index] == nil) then
 		LogLine("add player effect: "..effect.Name)
+	elseif not (effect.IsVisible) then
+		return RemovePlayerEffect(index)
 	end
 	PLAYER_EFFECTS[index] = effect
 end
@@ -192,13 +194,15 @@ function PlayerEffectWindow()
 end
 
 function PlayerEffectDetail(effect)
-	local timeRemaining = effect.EndTime - os.time()
-	if (timeRemaining < 0) then
-		RemovePlayerEffect(effect.Index)
-		return
+	local text = effect.Name
+	if (effect.EndTime > 0) then
+		local timeRemaining = effect.EndTime - os.time()
+		if (timeRemaining < 0) then
+			RemovePlayerEffect(effect.Index)
+			return
+		end
+		text = text..' ('..tostring(math.ceil(timeRemaining))..')'
 	end
-
-	local text = effect.Name..' ('..tostring(math.ceil(timeRemaining))..')'
 	ig.Text(text)
 end
 
