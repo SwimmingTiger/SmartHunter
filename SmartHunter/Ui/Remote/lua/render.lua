@@ -27,19 +27,6 @@ function FileExists(path)
   return file ~= nil
 end
 
-COLOR_HEALTH = RGBA(255, 0, 0, 0.6)
-COLOR_EFFECT = RGBA(0, 255, 255, 0.6)
-COLOR_WINDOW_BG = RGBA(0, 0, 0, 0)
-
-MONSTER_WINDOW_FLAG = imgui.ImGuiWindowFlags_AlwaysAutoResize + imgui.ImGuiWindowFlags_NoBackground + imgui.ImGuiWindowFlags_NoTitleBar
-PLAYER_EFFECTS_WINDOW_FLAG = MONSTER_WINDOW_FLAG
-
---ig.GetStyle().WindowTitleAlign = ig.ImVec2(0.5, 1.5)
-SetWindowBGColor(COLOR_WINDOW_BG)
-
-MONSTER_LINE_WIDTH = 250
-MONSTER_LINE_SIZE = 27
-
 -- load fonts
 if (FileExists(FONT_FILE)) then
 	ig.GetIO().Fonts:Clear()
@@ -53,15 +40,46 @@ else
 	LogLine("Missing font "..FONT_FILE)
 end
 
+COLOR_HEALTH = RGBA(255, 0, 0, 0.6)
+COLOR_EFFECT = RGBA(0, 255, 255, 0.6)
+COLOR_WINDOW_BG = RGBA(0, 0, 0, 0)
+
+MONSTER_WINDOW_FLAG = imgui.ImGuiWindowFlags_AlwaysAutoResize + imgui.ImGuiWindowFlags_NoBackground + imgui.ImGuiWindowFlags_NoTitleBar
+PLAYER_EFFECTS_WINDOW_FLAG = MONSTER_WINDOW_FLAG
+
+--ig.GetStyle().WindowTitleAlign = ig.ImVec2(0.5, 1.5)
+SetWindowBGColor(COLOR_WINDOW_BG)
+
+MONSTER_LINE_WIDTH = 250
+
 ------------------------- Utils --------------------------
 
-function DecentralizedAlignment(leftStr, rightStr, lineSize)
-	return leftStr..string.rep(' ', lineSize-string.len(leftStr)-string.len(rightStr))..rightStr
+function TextWidth(text)
+	return ig.CalcTextSize(text).x
 end
 
-function CenterAlignment(str, lineSize)
-	local pad = string.rep(' ', (lineSize-string.len(str))/2)
+function StrDecentralizedAlign(leftStr, rightStr, lineSize)
+	local spaceWidth = TextWidth(' ')
+	local spaceNum = (lineSize - TextWidth(leftStr) - TextWidth(rightStr)) / spaceWidth
+	return leftStr..string.rep(' ', spaceNum)..rightStr
+end
+
+function StrCenterAlign(str, lineSize)
+	local spaceWidth = TextWidth(' ')
+	local pad = string.rep(' ', (lineSize - TextWidth(str)) / 2 / spaceWidth)
 	return pad..str..pad
+end
+
+function TextDecentralizedAlign(leftStr, rightStr, lineSize)
+	ig.Text(leftStr)
+	ig.SameLine()
+	ig.SetCursorPosX(lineSize - TextWidth(rightStr) + 5)
+	ig.Text(rightStr)
+end
+
+function TextCenterAlign(str, lineSize)
+	ig.SetCursorPosX((lineSize - TextWidth(str)) / 2)
+	ig.Text(str)
 end
 
 ---------------------- Data Updates ----------------------
@@ -149,14 +167,14 @@ function MonsterWindow(monster, currPosition)
 		name = name..' ('..CROWN_NAME[monster.Crown]..')'
 	end
 	ig.Begin('Monster '..monster.Address, nil, MONSTER_WINDOW_FLAG)
-	ig.Text(CenterAlignment(name, MONSTER_LINE_SIZE))
+	TextCenterAlign(name, MONSTER_LINE_WIDTH)
 	MonsterDetail(monster)
 	ig.End()
 end
 
 function MonsterDetail(monster)
 	local percent = monster.Health.Fraction
-	local percentString = CenterAlignment(tostring(math.ceil(monster.Health.Current))..'/'..tostring(math.ceil(monster.Health.Max)), MONSTER_LINE_SIZE)
+	local percentString = StrCenterAlign(tostring(math.ceil(monster.Health.Current))..'/'..tostring(math.ceil(monster.Health.Max)), MONSTER_LINE_WIDTH)
 	SetProgressBarColor(COLOR_HEALTH)
 	ig.ProgressBar(percent, ig.ImVec2(MONSTER_LINE_WIDTH, 19), percentString)
 
@@ -178,8 +196,7 @@ function MonsterPart(part)
 	if (part.TimesBrokenCount > 0) then
 		name = name .. ' x' .. tostring(part.TimesBrokenCount)
 	end
-	local percentString = DecentralizedAlignment(name, tostring(math.ceil(part.Health.Current)) .. '/' .. tostring(math.ceil(part.Health.Max)), MONSTER_LINE_SIZE)
-	ig.Text(percentString)
+	TextDecentralizedAlign(name, tostring(math.ceil(part.Health.Current)) .. '/' .. tostring(math.ceil(part.Health.Max)), MONSTER_LINE_WIDTH)
 
 	local percent = part.Health.Fraction
 	SetProgressBarColor(COLOR_HEALTH)
@@ -191,8 +208,7 @@ function StatusEffect(effect)
 	if (effect.TimesActivatedCount > 0) then
 		name = name .. ' x' .. tostring(effect.TimesActivatedCount)
 	end
-	local percentString = DecentralizedAlignment(name, tostring(math.ceil(effect.Buildup.Current)) .. '/' .. tostring(math.ceil(effect.Buildup.Max)), MONSTER_LINE_SIZE)
-	ig.Text(percentString)
+	TextDecentralizedAlign(name, tostring(math.ceil(effect.Buildup.Current)) .. '/' .. tostring(math.ceil(effect.Buildup.Max)), MONSTER_LINE_WIDTH)
 
 	local percent = effect.Buildup.Fraction
 	SetProgressBarColor(COLOR_EFFECT)
