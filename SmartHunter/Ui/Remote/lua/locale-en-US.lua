@@ -4,3 +4,5 @@ CROWN_NAME = {
 	'Silver',
 	'Gold'
 }
+
+FONT_FILE = 'C:/Windows/Fonts/segoeuib.ttf'
