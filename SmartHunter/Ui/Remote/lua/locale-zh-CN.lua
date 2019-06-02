@@ -4,3 +4,5 @@ CROWN_NAME = {
 	'银冠',
 	'金冠'
 }
+
+FONT_FILE = 'C:/Windows/Fonts/simhei.ttf'

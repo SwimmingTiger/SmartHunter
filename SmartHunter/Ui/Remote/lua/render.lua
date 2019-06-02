@@ -2,10 +2,6 @@ LogLine("---------- Loading SmartHunter Widget ----------")
 
 ------------------------ Themes --------------------------
 
--- load fonts
---ig.GetIO().Fonts:AddFontFromFileTTF('C:\\Windows\\Fonts\\msyh.ttc', 16, nil, ig.GetIO().Fonts:GetGlyphRangesChineseFull())
---UpdateFontCache()
-
 function RGBA(r, g, b, a)
 	return ig.ImVec4(r/255, g/255, b/255, a)
 end
@@ -25,6 +21,12 @@ function SetWindowBGColor(color)
 	SetColor(imgui.ImGuiCol_TitleBgActive, color)
 end
 
+function FileExists(path)
+  local file = io.open(path, "rb")
+  if file then file:close() end
+  return file ~= nil
+end
+
 COLOR_HEALTH = RGBA(255, 0, 0, 0.6)
 COLOR_EFFECT = RGBA(0, 255, 255, 0.6)
 COLOR_WINDOW_BG = RGBA(0, 0, 0, 0)
@@ -37,6 +39,19 @@ SetWindowBGColor(COLOR_WINDOW_BG)
 
 MONSTER_LINE_WIDTH = 250
 MONSTER_LINE_SIZE = 27
+
+-- load fonts
+if (FileExists(FONT_FILE)) then
+	ig.GetIO().Fonts:Clear()
+	FONT = ig.GetIO().Fonts:AddFontFromFileTTF(FONT_FILE, 18, nil, ig.GetIO().Fonts:GetGlyphRangesChineseFull())
+	if (FONT ~= nil) then
+		UpdateFontCache()
+	else
+		LogLine("Cannot load font "..FONT_FILE)
+	end
+else
+	LogLine("Missing font "..FONT_FILE)
+end
 
 ------------------------- Utils --------------------------
 
@@ -84,6 +99,9 @@ PLAYER_EFFECTS = {}
 function UpdatePlayerEffect(index, data)
 	local effect = json.decode(data)
 	if (PLAYER_EFFECTS[index] == nil) then
+		if not (effect.IsVisible) then
+			return
+		end
 		LogLine("add player effect: "..effect.Name)
 	elseif not (effect.IsVisible) then
 		return RemovePlayerEffect(index)
