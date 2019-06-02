@@ -231,8 +231,9 @@ namespace SmartHunter.Game.Helpers
                     }
                     else
                     {
-                        effectTimer.EndTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds() + effect.Time.Current;
-                        effectTimer.BeginTime = effectTimer.EndTime - effect.Time.Max;
+                        // Note: Converting a unix timestamp to a float will result in a huge loss of precision.
+                        effectTimer.EndTime = (double)DateTimeOffset.UtcNow.ToUnixTimeSeconds() + (double)effect.Time.Current;
+                        effectTimer.BeginTime = (double)effectTimer.EndTime - (double)effect.Time.Max;
                     }
 
                     if (m_PlayerEffectTimers.ContainsKey(effectTimer.Index))
@@ -243,8 +244,6 @@ namespace SmartHunter.Game.Helpers
                             m_PlayerEffectTimers[effectTimer.Index] = effectTimer;
                             string json = JsonConvert.SerializeObject(effectTimer);
 
-                            Log.WriteLine("Update PlayerEffect: " + effectTimer.Name + ", json: " + json);
-
                             OverlayDisplayClient.GetInstance().UpdateView("smarthunter", "UpdatePlayerEffect('" + effectTimer.Index.ToString() + "',[===[" + json + "]===])");
                         }
                     }
@@ -252,9 +251,6 @@ namespace SmartHunter.Game.Helpers
                     {
                         m_PlayerEffectTimers[effectTimer.Index] = effectTimer;
                         string json = JsonConvert.SerializeObject(effectTimer);
-
-                        Log.WriteLine("Add PlayerEffect: " + effectTimer.Name + ", json: " + json);
-                        //Log.WriteLine("Add PlayerEffect: " + effectTimer.Name);
 
                         OverlayDisplayClient.GetInstance().UpdateView("smarthunter", "AddPlayerEffect('" + effectTimer.Index.ToString() + "',[===[" + json + "]===])");
                     }
