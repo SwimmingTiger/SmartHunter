@@ -31,10 +31,10 @@ COLOR_HEALTH = RGBA(255, 0, 0, 0.6)
 COLOR_EFFECT = RGBA(0, 255, 255, 0.6)
 COLOR_WINDOW_BG = RGBA(0, 0, 0, 0)
 
-MONSTER_WINDOW_FLAG = imgui.ImGuiWindowFlags_AlwaysAutoResize + imgui.ImGuiWindowFlags_NoBackground + imgui.ImGuiWindowFlags_NoCollapse
-PLAYER_EFFECTS_WINDOW_FLAG = MONSTER_WINDOW_FLAG + imgui.ImGuiWindowFlags_NoTitleBar
+MONSTER_WINDOW_FLAG = imgui.ImGuiWindowFlags_AlwaysAutoResize + imgui.ImGuiWindowFlags_NoBackground + imgui.ImGuiWindowFlags_NoTitleBar
+PLAYER_EFFECTS_WINDOW_FLAG = MONSTER_WINDOW_FLAG
 
-ig.GetStyle().WindowTitleAlign = ig.ImVec2(0.5, 1.5)
+--ig.GetStyle().WindowTitleAlign = ig.ImVec2(0.5, 1.5)
 SetWindowBGColor(COLOR_WINDOW_BG)
 
 MONSTER_LINE_WIDTH = 250
@@ -148,7 +148,8 @@ function MonsterWindow(monster, currPosition)
 	if (monster.Crown > 0) then
 		name = name..' ('..CROWN_NAME[monster.Crown]..')'
 	end
-	ig.Begin(name, nil, MONSTER_WINDOW_FLAG)
+	ig.Begin('Monster '..monster.Address, nil, MONSTER_WINDOW_FLAG)
+	ig.Text(CenterAlignment(name, MONSTER_LINE_SIZE))
 	MonsterDetail(monster)
 	ig.End()
 end
